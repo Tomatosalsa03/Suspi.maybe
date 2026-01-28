@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Valentine.exe</title>
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Crimson+Pro:wght@400;600&display=swap" rel="stylesheet">
+    
+    <!-- YouTube IFrame API -->
+    <script src="https://www.youtube.com/iframe_api"></script>
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Crimson Pro', serif;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Floating hearts background */
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .floating-heart {
+            position: absolute;
+            font-size: 20px;
+            animation: float 10s infinite ease-in-out;
+            opacity: 0.1;
+        }
+
+        .floating-lily {
+            position: absolute;
+            font-size: 30px;
+            animation: floatLily 12s infinite ease-in-out;
+            opacity: 0.15;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-100px) rotate(180deg); }
+        }
+
+        @keyframes floatLily {
+            0%, 100% { 
+                transform: translateY(0) rotate(0deg) translateX(0); 
+            }
+            33% { 
+                transform: translateY(-80px) rotate(120deg) translateX(30px); 
+            }
+            66% { 
+                transform: translateY(-50px) rotate(240deg) translateX(-30px); 
+            }
+        }
+
+        .container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            padding: 50px 40px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 30px 80px rgba(255, 107, 157, 0.4), 
+                        0 0 50px rgba(255, 182, 193, 0.3);
+            text-align: center;
+            position: relative;
+            z-index: 1;
+            animation: slideIn 0.5s ease-out, glowPulse 3s infinite;
+            border: 2px solid rgba(255, 182, 193, 0.5);
+        }
+
+        @keyframes glowPulse {
+            0%, 100% { 
+                box-shadow: 0 30px 80px rgba(255, 107, 157, 0.4), 
+                            0 0 50px rgba(255, 182, 193, 0.3);
+            }
+            50% { 
+                box-shadow: 0 30px 80px rgba(255, 107, 157, 0.6), 
+                            0 0 70px rgba(255, 182, 193, 0.5);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .title {
+            font-family: 'VT323', monospace;
+            font-size: 36px;
+            color: #ff6b9d;
+            margin-bottom: 30px;
+            letter-spacing: 2px;
+            text-shadow: 2px 2px 4px rgba(255, 107, 157, 0.3);
+        }
+
+        .loading-text {
+            font-size: 20px;
+            color: #333;
+            min-height: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1.6;
+        }
+
+        .loading-text.typing::after {
+            content: '|';
+            animation: blink 0.7s infinite;
+        }
+
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        .question-box {
+            display: none;
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        .question-box.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .question-text {
+            font-size: 22px;
+            color: #333;
+            margin-bottom: 30px;
+            line-height: 1.6;
+            font-weight: 600;
+        }
+
+        .alert-header {
+            color: #ff4757;
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            margin-top: 30px;
+        }
+
+        button {
+            font-family: 'Crimson Pro', serif;
+            font-size: 18px;
+            font-weight: 600;
+            padding: 16px 40px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .yes-btn {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+            color: white;
+            transform: scale(1);
+        }
+
+        .yes-btn:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(255, 107, 157, 0.4);
+        }
+
+        .no-btn {
+            background: #e0e0e0;
+            color: #666;
+            position: relative;
+        }
+
+        .no-btn:hover {
+            background: #d0d0d0;
+        }
+
+        .no-btn.running {
+            position: fixed !important;
+            transition: all 0.3s ease;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+            animation: bounceIn 0.5s ease-out;
+        }
+
+        @keyframes bounceIn {
+            0% { transform: scale(0.5); opacity: 0; }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            color: #ff6b9d;
+        }
+
+        .modal-text {
+            font-size: 18px;
+            line-height: 1.6;
+            color: #333;
+            margin-bottom: 25px;
+        }
+
+        .modal-close {
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 100%);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-size: 16px;
+            cursor: pointer;
+            font-family: 'Crimson Pro', serif;
+            font-weight: 600;
+        }
+
+        .emoji {
+            font-size: 40px;
+            margin-bottom: 20px;
+        }
+
+        /* Hidden YouTube players */
+        #bgPlayer, #successPlayer {
+            position: fixed;
+            top: -9999px;
+            left: -9999px;
+            width: 1px;
+            height: 1px;
+        }
+
+        /* Start screen */
+        .start-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #ff6b9d 0%, #c06c84 50%, #f67280 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
+        }
+
+        .start-screen.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .start-content {
+            text-align: center;
+            color: white;
+        }
+
+        .start-title {
+            font-family: 'VT323', monospace;
+            font-size: 48px;
+            margin-bottom: 20px;
+            letter-spacing: 3px;
+            animation: pulse 2s infinite;
+        }
+
+        .start-subtitle {
+            font-size: 20px;
+            margin-bottom: 40px;
+            opacity: 0.9;
+        }
+
+        .start-button {
+            font-family: 'Crimson Pro', serif;
+            font-size: 24px;
+            font-weight: 600;
+            padding: 20px 50px;
+            background: white;
+            color: #ff6b9d;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        .start-button:hover {
+            transform: scale(1.1) translateY(-5px);
+            box-shadow: 0 15px 40px rgba(255, 107, 157, 0.5);
+            background: #ffe6f0;
+        }
+
+        .start-button:active {
+            transform: scale(1.05);
+        }
+    </style>
+</head>
+<body>
+    <!-- Start Screen -->
+    <div class="start-screen" id="startScreen">
+        <div class="start-content">
+            <div class="start-title">💕 Valentine.exe 💕</div>
+            <div class="start-subtitle">A special message awaits...</div>
+            <button class="start-button" onclick="startExperience()">Click to Start ✨</button>
+        </div>
+    </div>
+
+    <!-- Hidden YouTube players -->
+    <div id="bgPlayer"></div>
+    <div id="successPlayer"></div>
+    
+    <!-- Background music -->
+    <audio id="bgAudio" src="background_music.mp3" loop></audio>
+    
+    <!-- Success audio -->
+    <audio id="successAudio" src="success_music.mp3"></audio>
+    
+    <div class="heart-bg" id="heartBg"></div>
+
+    <div class="container">
+        <div class="title">Valentine.exe</div>
+        
+        <div class="loading-text typing" id="loadingText"></div>
+        
+        <div class="question-box" id="questionBox">
+            <div class="alert-header">⚠️ SYSTEM ALERT ⚠️</div>
+            <div class="question-text">
+                Harshini, you have been officially selected<br>
+                as my favorite person in the universe.<br><br>
+                Will you be my Valentine? 🌸💕
+            </div>
+            <div class="buttons">
+                <button class="yes-btn" onclick="handleYes()">YES 💕</button>
+                <button class="no-btn" id="noBtn" onclick="handleNo()">NO 🙄</button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="emoji" id="modalEmoji">🎉</div>
+            <div class="modal-title" id="modalTitle">SUCCESS</div>
+            <div class="modal-text" id="modalText"></div>
+            <button class="modal-close" onclick="closeModal()">Close</button>
+        </div>
+    </div>
+
+    <script>
+        let bgPlayer, successPlayer;
+        let playersReady = 0;
+        let experienceStarted = false;
+
+        function startExperience() {
+            if (experienceStarted) return;
+            experienceStarted = true;
+
+            // Hide start screen
+            document.getElementById('startScreen').classList.add('hidden');
+
+            // Start background music (MP3)
+            const bgAudio = document.getElementById('bgAudio');
+            if (bgAudio) {
+                bgAudio.volume = 0.3;
+                bgAudio.play();
+            }
+
+            // Start the animation sequence
+            setTimeout(() => showNextMessage(), 500);
+        }
+
+        // YouTube IFrame API Ready
+        function onYouTubeIframeAPIReady() {
+            // Background music player
+            bgPlayer = new YT.Player('bgPlayer', {
+                height: '1',
+                width: '1',
+                videoId: '2AZOknKotVc',
+                playerVars: {
+                    autoplay: 0,
+                    loop: 1,
+                    playlist: '2AZOknKotVc',
+                    controls: 0
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+
+            // Success music player
+            successPlayer = new YT.Player('successPlayer', {
+                height: '1',
+                width: '1',
+                videoId: 'vXOp6k5qiio',
+                playerVars: {
+                    autoplay: 0,
+                    controls: 0
+                },
+                events: {
+                    'onReady': onPlayerReady
+                }
+            });
+        }
+
+        function onPlayerReady(event) {
+            playersReady++;
+        }
+
+        const loadingMessages = [
+            "Initializing girlfriend detector... 🔍",
+            "Running cuteness diagnostics... OVERLOAD DETECTED 📊",
+            "Checking smile database... Error: Too bright for system ✨",
+            "Analyzing compatibility... Match: 100% (I may be biased) 💯",
+            "Searching for flaws... Search failed. Zero results found 🤷‍♂️",
+            "Are you a software update? Because not right now, but definitely yes later 😏",
+            "Heart.exe has stopped working... Reason: Harshini 💖",
+            "Final calculation: You + Me = Best idea ever 🎯"
+        ];
+
+        const funnyResponses = [
+            "Hmm... that button seems broken 🤔",
+            "Nice try! System says: TRY AGAIN 😏",
+            "Error 404: 'NO' not found in database",
+            "Are you sure? Let me ask again... 😌",
+            "That button is just for decoration 💅",
+            "System override: Only 'YES' is valid 😎",
+            "Bold of you to think that would work 😏"
+        ];
+
+        let noClickCount = 0;
+        let currentMessage = 0;
+
+        // Create floating hearts and lilies
+        function createFloatingHearts() {
+            const heartBg = document.getElementById('heartBg');
+            
+            // Add hearts
+            for (let i = 0; i < 10; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'floating-heart';
+                heart.textContent = '💕';
+                heart.style.left = Math.random() * 100 + '%';
+                heart.style.top = Math.random() * 100 + '%';
+                heart.style.animationDelay = Math.random() * 10 + 's';
+                heartBg.appendChild(heart);
+            }
+            
+            // Add lilies
+            for (let i = 0; i < 8; i++) {
+                const lily = document.createElement('div');
+                lily.className = 'floating-lily';
+                lily.textContent = '🌸';
+                lily.style.left = Math.random() * 100 + '%';
+                lily.style.top = Math.random() * 100 + '%';
+                lily.style.animationDelay = Math.random() * 12 + 's';
+                heartBg.appendChild(lily);
+            }
+        }
+
+        // Typing effect
+        function typeMessage(message, callback) {
+            const loadingText = document.getElementById('loadingText');
+            loadingText.textContent = '';
+            let i = 0;
+            
+            const typing = setInterval(() => {
+                if (i < message.length) {
+                    loadingText.textContent += message.charAt(i);
+                    i++;
+                } else {
+                    clearInterval(typing);
+                    setTimeout(callback, 600);
+                }
+            }, 50);
+        }
+
+        function showNextMessage() {
+            if (currentMessage < loadingMessages.length) {
+                typeMessage(loadingMessages[currentMessage], () => {
+                    currentMessage++;
+                    showNextMessage();
+                });
+            } else {
+                document.getElementById('loadingText').style.display = 'none';
+                document.getElementById('questionBox').classList.add('active');
+            }
+        }
+
+        function handleYes() {
+            // Stop background music
+            const bgAudio = document.getElementById('bgAudio');
+            if (bgAudio) {
+                bgAudio.pause();
+            }
+            
+            // Play the success MP3
+            const successAudio = document.getElementById('successAudio');
+            if (successAudio) {
+                successAudio.play();
+            }
+            
+            showModal(
+                '🎉',
+                'SUCCESS',
+                "YESSSS! I knew you'd say yes! 🏆<br><br>" +
+                "Valentine's Day Status: DATE SECURED ✓<br>" +
+                "My Excitement Level: Through the roof 🚀<br>" +
+                "How I'm feeling right now: On top of the world 💯<br><br>" +
+                "This is going to be amazing, Harshini! 💖😊"
+            );
+        }
+
+        function handleNo() {
+            noClickCount++;
+            
+            if (noClickCount >= 3) {
+                const noBtn = document.getElementById('noBtn');
+                noBtn.classList.add('running');
+                moveButton();
+                showModal(
+                    '⚠️',
+                    'WARNING',
+                    "The NO button is now running away from you! 🏃‍♂️💨"
+                );
+            } else {
+                showModal(
+                    '❌',
+                    'ERROR',
+                    funnyResponses[Math.floor(Math.random() * funnyResponses.length)]
+                );
+            }
+        }
+
+        function moveButton() {
+            const noBtn = document.getElementById('noBtn');
+            const maxX = window.innerWidth - noBtn.offsetWidth - 20;
+            const maxY = window.innerHeight - noBtn.offsetHeight - 20;
+            
+            noBtn.style.left = Math.random() * maxX + 'px';
+            noBtn.style.top = Math.random() * maxY + 'px';
+        }
+
+        function showModal(emoji, title, text) {
+            document.getElementById('modalEmoji').textContent = emoji;
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalText').innerHTML = text;
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+        }
+
+        // Initialize
+        createFloatingHearts();
+    </script>
+</body>
+</html>
